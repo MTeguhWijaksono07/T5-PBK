@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue List Rendering</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .notification {
+      background-color: #ffffcc;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ffcc00;
+    }
+    .status-panel {
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    input, button {
+      padding: 5px;
+      margin-right: 5px;
+    }
+    .help-text {
+      font-size: 0.8em;
+      color: gray;
+      margin-bottom: 15px;
+    }
+    li {
+      padding: 8px;
+      margin: 5px 0;
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
+    .delete-btn {
+      background-color: #ff0000;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .summary, .large-quantity {
+      padding: 10px;
+      margin-top: 15px;
+      background-color: #f0f0f0;
+    }
+    .increase {
+      color: green;
+    }
+    .decrease {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Daftar Item</h1>
+    
+    <!-- Notifikasi dari watcher -->
+    <div v-if="notifikasi" class="notification">
+      {{ notifikasi }}
+    </div>
+    
+    <!-- Status panel untuk menampilkan lastAction -->
+    <div class="status-panel" ref="statusElement">
+      <p>Status: {{ lastAction || 'Siap' }}</p>
+    </div>
+    
+    <div class="form-group">
+      <input 
+        type="text" 
+        v-model="newItem.nama" 
+        placeholder="Nama Item" 
+        required
+        ref="namaInput"
+      >
+      <input 
+        type="number" 
+        v-model="newItem.jumlah" 
+        placeholder="Jumlah" 
+        required
+      >
+      <button @click="tambahItem">Tambah</button>
+    </div>
+    
+    <p class="help-text">Tip: Gunakan Ctrl+Enter untuk menambahkan item</p>
+
+    <div v-if="items.length === 0">
+      Belum ada item dalam daftar
+    </div>
+    
+    <ul v-else ref="itemList" style="list-style-type: none; padding: 0;">
+      <!-- Gunakan v-for untuk merender daftar items -->
+      <li v-for="(item, index) in items" :key="index">
+        <div>
+          <strong>{{ item.nama }}</strong> - 
+          Jumlah: {{ item.jumlah }}
+        </div>
+        <button class="delete-btn" @click="hapusItem(index)">Hapus</button>
+      </li>
+    </ul>
+    
+    <div v-if="items.length > 0" class="summary">
+      <h3>Total Item: {{ totalItems }} 
+        <span v-if="statusPerubahan === 'meningkat'" class="increase">↑</span>
+        <span v-if="statusPerubahan === 'menurun'" class="decrease">↓</span>
+      </h3>
+      <h3>Total Jenis Item: {{ totalJenisItem }}</h3>
+    </div>
+    
+    <!-- Menampilkan item dengan jumlah > 5 -->
+    <div v-if="largeQuantityItems.length > 0" class="large-quantity">
+      <h3>Items dengan jumlah > 5:</h3>
+      <ul style="list-style-type: none; padding: 0;">
+        <li v-for="(item, index) in largeQuantityItems" :key="index">
+          {{ item.nama }} - {{ item.jumlah }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

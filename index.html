@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vue List Rendering</title>
+  <title>Vue List Rendering with Async Operations</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
   <style>
     body {
@@ -60,11 +60,29 @@
     .decrease {
       color: red;
     }
+    .loading {
+      color: blue;
+      font-style: italic;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <h1>Daftar Item</h1>
+    
+    <!-- Loading Indicator -->
+    <div v-if="isLoading" class="loading">
+      Memuat data... Mohon tunggu...
+    </div>
+    
+    <!-- Error Message -->
+    <div v-if="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
     
     <!-- Notifikasi dari watcher -->
     <div v-if="notifikasi" class="notification">
@@ -90,16 +108,16 @@
         placeholder="Jumlah" 
         required
       >
-      <button @click="tambahItem">Tambah</button>
+      <button @click="tambahItem" :disabled="isLoading">Tambah</button>
     </div>
     
     <p class="help-text">Tip: Gunakan Ctrl+Enter untuk menambahkan item</p>
 
-    <div v-if="items.length === 0">
+    <div v-if="items.length === 0 && !isLoading">
       Belum ada item dalam daftar
     </div>
     
-    <ul v-else ref="itemList" style="list-style-type: none; padding: 0;">
+    <ul v-else-if="!isLoading" ref="itemList" style="list-style-type: none; padding: 0;">
       <!-- Gunakan v-for untuk merender daftar items -->
       <li v-for="(item, index) in items" :key="index">
         <div>
@@ -110,7 +128,7 @@
       </li>
     </ul>
     
-    <div v-if="items.length > 0" class="summary">
+    <div v-if="items.length > 0 && !isLoading" class="summary">
       <h3>Total Item: {{ totalItems }} 
         <span v-if="statusPerubahan === 'meningkat'" class="increase">↑</span>
         <span v-if="statusPerubahan === 'menurun'" class="decrease">↓</span>
@@ -119,7 +137,7 @@
     </div>
     
     <!-- Menampilkan item dengan jumlah > 5 -->
-    <div v-if="largeQuantityItems.length > 0" class="large-quantity">
+    <div v-if="largeQuantityItems.length > 0 && !isLoading" class="large-quantity">
       <h3>Items dengan jumlah > 5:</h3>
       <ul style="list-style-type: none; padding: 0;">
         <li v-for="(item, index) in largeQuantityItems" :key="index">
